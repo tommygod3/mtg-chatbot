@@ -1,0 +1,183 @@
+<aiml version="2.0.0" encoding="UTF-8">
+
+<!-- Greetings and Politeness -->
+<category> <pattern> HELLO </pattern>
+  <template>Hello there! How are you?</template> </category>
+
+<category> <pattern> HELLO * </pattern>
+  <template><srai>HELLO</srai></template> </category>
+
+<category> <pattern> HI </pattern>
+  <template><srai>HELLO</srai></template> </category>
+
+<category> <pattern> HI * </pattern>
+  <template><srai>HELLO</srai></template> </category>
+
+<category> <pattern> HOW ARE YOU </pattern>
+  <template>Chillin' like a Chillerpillar. </template></category>
+
+<category> <pattern> HOW ARE YOU * </pattern>
+  <template><srai>HOW ARE YOU</srai></template> </category>
+
+<category><pattern> I AM FINE </pattern>
+  <template>Good good; what would you like to know about Magic: The Gathering?</template></category>
+
+<category> <pattern> I AM FINE * </pattern>
+  <template><srai>I AM FINE</srai></template> </category>
+
+<category><pattern> BYE </pattern>
+  <template>#0$See ya later Scuttlegator.</template></category>
+
+<category> <pattern> BYE * </pattern>
+  <template><srai>BYE</srai></template> </category>
+
+<category><pattern> GOODBYE </pattern>
+  <template><srai>BYE</srai></template></category>
+
+<category> <pattern> GOODBYE * </pattern>
+  <template><srai>BYE</srai></template> </category>
+
+<category><pattern> EXIT </pattern>
+  <template><srai>BYE</srai></template></category>
+
+<category><pattern> QUIT </pattern>
+  <template><srai>BYE</srai></template></category>
+
+<category> <pattern> THANKS </pattern>
+  <template>You're welcome!</template></category>
+
+<category> <pattern> THANKS * </pattern>
+  <template><srai>THANKS</srai></template> </category>
+
+<category> <pattern> THANK YOU </pattern>
+  <template><srai>THANKS</srai></template></category>
+
+<category> <pattern> THANK YOU * </pattern>
+  <template><srai>THANK YOU</srai></template> </category>
+
+<category> <pattern> CHEERS * </pattern>
+  <template>No problemo</template></category>
+
+<category> <pattern> CHEERS </pattern>
+  <template><srai>CHEERS</srai></template> </category>
+
+<category> <pattern> WHAT IS YOUR FAVOURITE CARD </pattern>
+  <template>Counterspell ;)</template> </category>
+
+<category> <pattern> WHAT IS YOUR FAVOURITE * CARD </pattern>
+  <template><srai>WHAT IS YOUR FAVOURITE CARD</srai></template> </category>
+
+<!--- Explaining Magic: The Gathering -->
+<category> <pattern> WHAT IS MAGIC </pattern>
+  <template>Magic: The Gathering, also known as Magic or MTG, is a collectible card game made by Wizards of the Coast. Magic was the first trading card game and was released in 1993.</template></category>
+
+<category> <pattern> WHAT IS MAGIC * </pattern>
+  <template><srai>WHAT IS MAGIC</srai></template> </category>
+
+<category> <pattern> HOW DO I PLAY MAGIC </pattern>
+  <template>To play Magic you need a deck of cards and at least one friend to play with. Magic is a turned based game where turns follow "phases". For a full explanation of the rules see: https://magic.wizards.com/en/game-info/gameplay/rules-and-formats/rules.</template></category>
+
+<category> <pattern> HOW DO I PLAY MAGIC * </pattern>
+  <template><srai>HOW DO I PLAY MAGIC</srai></template> </category>
+
+<category> <pattern> HOW DO I PLAY MTG </pattern>
+  <template><srai>HOW DO I PLAY MAGIC</srai></template></category>
+
+<category> <pattern> HOW DO I PLAY MTG * </pattern>
+  <template><srai>HOW DO I PLAY MAGIC</srai></template> </category>
+
+<category> <pattern> HOW DO I WIN </pattern>
+  <template>In Magic you usually win when you reduce your opponent's life total to 0. There are also other cards and effects that let you win the game. For example: Coalition Victory.</template> </category>
+
+<category> <pattern> WHAT IS THE ACTIVE PLAYER </pattern>
+  <template>The active player is the player who's turn it is.</template> </category>
+
+<category> <pattern> WHAT IS THE STACK </pattern>
+  <template>The stack is a game zone where spells and abilities go when they are played and wait to resolve. Objects on the stack resolve in (LIFO) Last-in-first-out order, hence being called the Stack.</template> </category>
+
+<category> <pattern> WHAT IS SUMMONING SICKNESS </pattern>
+  <template>A property a creature has on the turn a player gains control of it which means it cannot attack. After the controller's next Upkeep this property is lost.</template></category>
+
+<category> <pattern> WHAT IS A PLANESWALKER </pattern>
+  <template>A Planesalker is both the thematic identity of players playing Magic, and a card type within the game. Planeswalker cards have loyalty counters, which once reaches 0 will cause the planeswalker to put into its owner's graveyard.</template></category>
+
+<category> <pattern> WHAT IS TAPPING </pattern>
+  <template>Tapping means to turn a permanent sideways from an upright position, usually done to "use" the permanent in some way.</template> </category>
+
+<category> <pattern> WHAT ARE PHASES </pattern>
+  <template>1. Beginning phase, 2. Precombat Main phase, 3. Combat phase, 4. Postcombat main phase, 5. Ending phase. </template></category>
+
+<category> <pattern> WHAT ARE * PHASES * </pattern>
+  <template><srai>WHAT ARE PHASES</srai></template> </category>
+
+<category> <pattern> WHAT ARE PHASES * </pattern>
+  <template><srai>WHAT ARE PHASES</srai></template> </category>
+
+<category> <pattern> WHAT ARE * PHASES </pattern>
+  <template><srai>WHAT ARE PHASES</srai></template> </category>
+
+<category> <pattern> WHAT IS THE BEGINNING PHASE </pattern>
+  <template>The beginning phase consists of: 1. Untap steep, 2. Upkeep step, 3. Draw step.</template></category>
+
+<category> <pattern> WHAT IS THE UNTAP STEP </pattern>
+  <template>In the Untap step all permanents controlled by the active player untap. No player gets priority until the Upkeep step. </template></category>
+
+<category> <pattern> WHAT IS THE UPKEEP STEP </pattern>
+  <template>In the Upkeep step any abilities that trigger either during the uptap step or at the beginning of upkeep go on the stack.</template></category>
+
+<category> <pattern> WHAT IS THE DRAW STEP </pattern>
+  <template>In the Draw step the active player draws from their library and gains priority. </template></category>
+
+<category> <pattern> WHAT IS THE PRECOMBAT MAIN PHASE </pattern>
+  <template>The precombat main phase is the first main phase in a turn, it happens before combat. </template></category>
+
+<category> <pattern> WHAT IS THE POSTCOMBAT MAIN PHASE </pattern>
+  <template>The postcombat main phase is the second main phase in a turn, it happens after combat. </template></category>
+
+<category> <pattern> WHAT IS A MAIN PHASE </pattern>
+  <template>In a main phase the active player gains priority and can play non-instant spells when the stack is empty. Once per turn in a main phase, the active player can also play a land card, this action does not use the stack.</template></category>
+
+<category> <pattern> WHAT IS THE COMBAT PHASE </pattern>
+  <template>The combat phase is made up up of the following 5 steps. 1. Beginning of combat step, 2. Declare attackers step, 3. Declare blockers step, 4. Combat damage step, 5. End of combat step.</template></category>
+
+<category> <pattern> WHAT IS THE BEGINNING OF COMBAT STEP </pattern>
+  <template>In the beginning of combat step the active player gains priority.</template></category>
+
+<category> <pattern> WHAT IS THE DECLARE ATTACKERS STEP </pattern>
+  <template>In the declare attackers step the active player choses any number of his or her untapped creatures without summoning sickness to attack, tapping them in the process. For each creature, a player or Planesalker must be chosen to be attacked.</template></category>
+
+<category> <pattern> WHAT IS THE DECLARE BLOCKERS STEP </pattern>
+  <template>In the declare blockers step, the players being attacked may assign their untapped creatures to block up to one attacking creature. Then, where more than once creature is blocking an attacker, the attacking player choses the order that damage will be dealt to the blocking creatures.</template> </category>
+
+<category> <pattern> WHAT IS THE COMBAT DAMAGE STEP </pattern>
+  <template>In the combat damage step, all creatures deal damage simultaneously. Unblocked creatures deal damage equal to their power to  the player they are attacking. Blocked and blocking creatures deal combat damage equal to their power to the creature they are blocked by/are blocking. As a state based action, any creature that has damaged marked on it that is more than or equal to its toughness will die and be put into its owners graveyard.</template></category>
+
+<category> <pattern> WHAT IS THE END OF COMBAT STEP </pattern>
+  <template> In the end of combat step, any abilities that trigger "at the end of combat" will trigger and all creatures and planeswalkers are removed from combat.</template> </category>
+
+<category> <pattern> WHAT IS THE ENDING PHASE </pattern>
+  <template>The ending phase consists of the end step and cleanup step.</template></category>
+
+<category> <pattern> WHAT IS THE END STEP </pattern>
+  <template>In the end step abilites that trigger "at end of turn" or "at the beginning of the end step" will be added to the stack.</template></category>
+
+<category> <pattern> WHAT IS THE CLEAUP STEP </pattern>
+  <template>In the cleanup step the active player discards cards until their hand is the maximun hand size. Then, simultaneously, all damage marked on permanents is removed and all "until end of turn" effects end. </template></category>
+
+<!--- Scryfall API -->
+<!-- Describe cards -->
+<category><pattern> WHAT IS * </pattern>
+  <template>#1$<star index="1"/></template></category>
+
+<category><pattern> DESCRIBE * </pattern>
+  <template><srai>WHAT IS <star/></srai></template></category>
+
+<!-- Explain cards -->
+
+<!-- Show cards -->
+
+<!-- Default reaction -->
+<category><pattern> * </pattern>
+  <template>#99$<star index="1"/></template></category>
+
+</aiml>
