@@ -3,7 +3,7 @@ from PIL import Image
 from io import BytesIO
 from requests.exceptions import HTTPError
 
-from scryfall_api import Scryfall
+from scryfall import Scryfall
 
 class Chatbot:
     def __init__(self):
