@@ -41,7 +41,7 @@ class Chatbot:
             if agent == "aiml":
                 answer = self.kernel.respond(user_input)
             if not answer:
-                print("I don't understand")
+                print("I don't understand :(")
             if self.is_command(answer):
                 command = self.get_command(answer)
                 if command["command"] == "quit":
@@ -57,6 +57,45 @@ class Chatbot:
                         print(card["oracle_text"])
                     except RuntimeError as e:
                         print(f'{e}')
+
+                if command["command"] == "colour":
+                    try:
+                        card = self.scryfall_api.get_card(command["parameter"])
+                        if not card["colors"]:
+                            print(f"{card['name']} is colourless!")
+                        else:
+                            print(card["colors"])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                if command["command"] == "cost":
+                    try:
+                        card = self.scryfall_api.get_card(command["parameter"])
+                        print(card["mana_cost"])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                if command["command"] == "type":
+                    try:
+                        card = self.scryfall_api.get_card(command["parameter"])
+                        print(card["type_line"])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                if command["command"] == "text":
+                    try:
+                        card = self.scryfall_api.get_card(command["parameter"])
+                        print(card["oracle_text"])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                if command["command"] == "favourite":
+                    try:
+                        card = self.scryfall_api.get_card(command['parameter'])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                    print(f"{card['name']}? Cool")
 
                 if command["command"] == "default":
                     print(f"No match, what is {command['parameter']}?")

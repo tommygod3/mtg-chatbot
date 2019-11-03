@@ -74,13 +74,6 @@
   <template><srai>BYE</srai></template></category>
 
 <category>
-  <pattern>MY FAVOURITE CARD IS *</pattern>
-  <template>
-      Hello <set name = "username"><star/></set>
-  </template>  
-</category>
-
-<category>
   <pattern>THANKS</pattern>
   <template>
       <random>
@@ -206,6 +199,75 @@
 <category> <pattern> WHAT IS THE CLEAUP STEP </pattern>
   <template>In the cleanup step the active player discards cards until their hand is the maximun hand size. Then, simultaneously, all damage marked on permanents is removed and all "until end of turn" effects end. </template></category>
 
+<!-- Remember cards -->
+<category>
+  <pattern>MY FAVOURITE CARD IS *</pattern>
+  <template>
+      #favourite$<set name = "favourite_card"><star/></set>
+  </template>
+</category>
+
+<category>
+  <pattern>WHAT IS MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know, you tell me!</li>
+    <li><get name = "favourite_card"/>!</li>
+    </condition>
+  </template>  
+</category>
+
+<category>
+  <pattern>DESCRIBE MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>DESCRIBE <get name = "favourite_card"/></srai></li>
+    </condition>
+  </template>  
+</category>
+
+<category>
+  <pattern>WHAT COLOUR IS MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>WHAT COLOUR IS <get name = "favourite_card"/></srai></li>
+    </condition>
+  </template>  
+</category>
+
+<category>
+  <pattern>WHAT TYPE IS MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>WHAT TYPE IS <get name = "favourite_card"/></srai></li>
+    </condition>
+  </template>  
+</category>
+
+<category>
+  <pattern>HOW MUCH DOES MY FAVOURITE CARD COST</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>HOW MUCH DOES <get name = "favourite_card"/> COST</srai></li>
+    </condition>
+  </template>  
+</category>
+
+<category>
+  <pattern>WHAT DOES MY FAVOURITE CARD DO</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li value="counterspell">Stops people having fun.</li>
+    <li><srai>WHAT DOES <get name = "favourite_card"/> DO</srai></li>
+    </condition>
+  </template>  
+</category>
+
 <!--- Scryfall API -->
 <!-- Describe cards -->
 <category><pattern> WHAT IS * </pattern>
@@ -215,6 +277,17 @@
   <template><srai>WHAT IS <star/></srai></template></category>
 
 <!-- Explain cards -->
+<category> <pattern> WHAT COLOUR IS * </pattern>
+  <template>#colour$<star index="1"/></template></category>
+
+<category> <pattern> WHAT TYPE IS * </pattern>
+  <template>#type$<star index="1"/></template></category>
+
+<category> <pattern> HOW MUCH DOES * COST</pattern>
+  <template>#cost$<star index="1"/></template></category>
+
+<category> <pattern> WHAT DOES * DO</pattern>
+  <template>#text$<star index="1"/></template></category>
 
 <!-- Show cards -->
 
