@@ -268,6 +268,16 @@
   </template>  
 </category>
 
+<category>
+  <pattern>SHOW ME MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>SHOW ME <get name = "favourite_card"/></srai></li>
+    </condition>
+  </template>  
+</category>
+
 <!--- Scryfall API -->
 <!-- Describe cards -->
 <category><pattern> WHAT IS * </pattern>
@@ -290,6 +300,8 @@
   <template>#text$<star index="1"/></template></category>
 
 <!-- Show cards -->
+<category> <pattern> SHOW ME *</pattern>
+  <template>#show$<star index="1"/></template></category>
 
 <!-- Default reaction -->
 <category><pattern> * </pattern>

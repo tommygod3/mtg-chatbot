@@ -1,4 +1,6 @@
-import aiml
+import aiml, requests
+from PIL import Image
+from io import BytesIO
 from requests.exceptions import HTTPError
 
 from scryfall_api import Scryfall
@@ -69,6 +71,15 @@ class Chatbot:
             print(f'{e}')
 
         print(f"{card['name']}? Cool")
+    
+    def show_card(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+        except RuntimeError as e:
+            print(f'{e}')
+        response = requests.get(card["image_uris"]["large"])
+        img = Image.open(BytesIO(response.content))
+        img.show()
 
     def run(self):
         print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
@@ -96,21 +107,18 @@ class Chatbot:
 
                 if command == "describe":
                     self.print_description(parameter)
-
                 if command == "colour":
                     self.print_colour(parameter)
-
                 if command == "cost":
                     self.print_cost(parameter)
-
                 if command == "type":
                     self.print_type(parameter)
-
                 if command == "text":
                     self.print_text(parameter)
-
                 if command == "favourite":
                     self.print_favourite(parameter)
+                if command == "show":
+                    self.show_card(parameter)
 
                 if command == "default":
                     print(f"No match, what is {parameter}?")
