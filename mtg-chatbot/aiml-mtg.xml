@@ -278,8 +278,15 @@
   </template>  
 </category>
 
+
 <!--- Scryfall API -->
 <!-- Describe cards -->
+<category><pattern> DESCRIBE A RANDOM CARD </pattern>
+  <template>#describe_random$none</template></category>
+
+<category><pattern> GET A RANDOM CARD </pattern>
+  <template><srai>DESCRIBE A RANDOM CARD</srai></template></category>
+
 <category><pattern> WHAT IS * </pattern>
   <template>#describe$<star index="1"/></template></category>
 
@@ -300,6 +307,9 @@
   <template>#text$<star index="1"/></template></category>
 
 <!-- Show cards -->
+<category><pattern> SHOW ME A RANDOM CARD </pattern>
+  <template>#show_random$none</template></category>
+
 <category> <pattern> SHOW ME *</pattern>
   <template>#show$<star index="1"/></template></category>
 

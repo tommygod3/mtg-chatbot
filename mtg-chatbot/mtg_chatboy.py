@@ -33,6 +33,16 @@ class Chatbot:
         except RuntimeError as e:
             print(f'{e}')
 
+    def print_description_random(self):
+        try:
+            card = self.scryfall_api.random_card()
+            print(f'{card["name"]}:')
+            print(card["mana_cost"])
+            print(card["type_line"])
+            print(card["oracle_text"])
+        except RuntimeError as e:
+            print(f'{e}')
+
     def print_colour(self, name):
         try:
             card = self.scryfall_api.get_card(name)
@@ -81,6 +91,15 @@ class Chatbot:
         img = Image.open(BytesIO(response.content))
         img.show()
 
+    def show_card_random(self):
+        try:
+            card = self.scryfall_api.random_card()
+        except RuntimeError as e:
+            print(f'{e}')
+        response = requests.get(card["image_uris"]["large"])
+        img = Image.open(BytesIO(response.content))
+        img.show()
+
     def run(self):
         print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
 
@@ -107,6 +126,8 @@ class Chatbot:
 
                 if command == "describe":
                     self.print_description(parameter)
+                if command == "describe_random":
+                    self.print_description_random()
                 if command == "colour":
                     self.print_colour(parameter)
                 if command == "cost":
@@ -119,21 +140,12 @@ class Chatbot:
                     self.print_favourite(parameter)
                 if command == "show":
                     self.show_card(parameter)
+                if command == "show_random":
+                    self.show_card_random()
 
                 if command == "default":
                     print(f"No match, what is {parameter}?")
             else:
                 print(answer)
 
-
 Chatbot().run()
-
-
-# Describe X card?
-# Show me X card?
-# What colour is X?
-# How much does X cost?
-# What is your favourite card?
-# Show me a random card
-
-
