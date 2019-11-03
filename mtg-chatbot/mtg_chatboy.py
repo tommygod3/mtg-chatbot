@@ -11,18 +11,64 @@ class Chatbot:
     def is_command(self, user_input):
         return user_input[0] == "#"
 
-    def get_command(self, user_input):
-        command_dict = {}
+    def get_command_and_parameter(self, user_input):
         command = user_input[1:].split("$")[0]
         parameter = user_input[1:].split("$")[1]
-        command_dict["command"] = command
-        command_dict["parameter"] = parameter
-        return command_dict
+        return command, parameter
 
     def set_kernel(self):
         self.kernel = aiml.Kernel()
         self.kernel.setTextEncoding(None)
         self.kernel.bootstrap(learnFiles="aiml-mtg.xml")
+
+    def print_description(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            print(f'{card["name"]}:')
+            print(card["mana_cost"])
+            print(card["type_line"])
+            print(card["oracle_text"])
+        except RuntimeError as e:
+            print(f'{e}')
+
+    def print_colour(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            if not card["colors"]:
+                print(f"{card['name']} is colourless!")
+            else:
+                print(card["colors"])
+        except RuntimeError as e:
+            print(f'{e}')
+
+    def print_cost(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            print(card["mana_cost"])
+        except RuntimeError as e:
+            print(f'{e}')
+
+    def print_type(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            print(card["type_line"])
+        except RuntimeError as e:
+            print(f'{e}')
+
+    def print_text(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            print(card["oracle_text"])
+        except RuntimeError as e:
+            print(f'{e}')
+
+    def print_favourite(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+        except RuntimeError as e:
+            print(f'{e}')
+
+        print(f"{card['name']}? Cool")
 
     def run(self):
         print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
@@ -43,62 +89,31 @@ class Chatbot:
             if not answer:
                 print("I don't understand :(")
             if self.is_command(answer):
-                command = self.get_command(answer)
-                if command["command"] == "quit":
-                    print(command["parameter"])
+                command, parameter = self.get_command_and_parameter(answer)
+                if command == "quit":
+                    print(parameter)
                     break
 
-                if command["command"] == "describe":
-                    try:
-                        card = self.scryfall_api.get_card(command["parameter"])
-                        print(f'{card["name"]}:')
-                        print(card["mana_cost"])
-                        print(card["type_line"])
-                        print(card["oracle_text"])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "describe":
+                    self.print_description(parameter)
 
-                if command["command"] == "colour":
-                    try:
-                        card = self.scryfall_api.get_card(command["parameter"])
-                        if not card["colors"]:
-                            print(f"{card['name']} is colourless!")
-                        else:
-                            print(card["colors"])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "colour":
+                    self.print_colour(parameter)
 
-                if command["command"] == "cost":
-                    try:
-                        card = self.scryfall_api.get_card(command["parameter"])
-                        print(card["mana_cost"])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "cost":
+                    self.print_cost(parameter)
 
-                if command["command"] == "type":
-                    try:
-                        card = self.scryfall_api.get_card(command["parameter"])
-                        print(card["type_line"])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "type":
+                    self.print_type(parameter)
 
-                if command["command"] == "text":
-                    try:
-                        card = self.scryfall_api.get_card(command["parameter"])
-                        print(card["oracle_text"])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "text":
+                    self.print_text(parameter)
 
-                if command["command"] == "favourite":
-                    try:
-                        card = self.scryfall_api.get_card(command['parameter'])
-                    except RuntimeError as e:
-                        print(f'{e}')
+                if command == "favourite":
+                    self.print_favourite(parameter)
 
-                    print(f"{card['name']}? Cool")
-
-                if command["command"] == "default":
-                    print(f"No match, what is {command['parameter']}?")
+                if command == "default":
+                    print(f"No match, what is {parameter}?")
             else:
                 print(answer)
 

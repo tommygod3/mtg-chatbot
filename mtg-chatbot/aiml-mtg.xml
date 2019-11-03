@@ -248,11 +248,11 @@
 </category>
 
 <category>
-  <pattern>HOW MUCH DOES MY FAVOURITE CARD COST</pattern>
+  <pattern>WHAT DOES MY FAVOURITE CARD COST</pattern>
   <template>
     <condition name = "favourite_card">
     <li value="">I don't know what your favourite card is!</li>
-    <li><srai>HOW MUCH DOES <get name = "favourite_card"/> COST</srai></li>
+    <li><srai>WHAT DOES <get name = "favourite_card"/> COST</srai></li>
     </condition>
   </template>  
 </category>
@@ -283,7 +283,7 @@
 <category> <pattern> WHAT TYPE IS * </pattern>
   <template>#type$<star index="1"/></template></category>
 
-<category> <pattern> HOW MUCH DOES * COST</pattern>
+<category> <pattern> WHAT DOES * COST</pattern>
   <template>#cost$<star index="1"/></template></category>
 
 <category> <pattern> WHAT DOES * DO</pattern>
