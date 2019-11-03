@@ -11,12 +11,17 @@ class Scryfall:
 
     def get_card(self, name):
         encoded = name.replace(" ", "+")
-        url = f"https://api.scryfall.com/cards/named?fuzzy={encoded}"
-        result = requests.get(url)
-        response_string = result.content
-        card = json.loads(response_string)
-        print(card["name"])
+        url = f"https://api.scryfall.com/cards/named?exact={encoded}"
 
+
+        response = requests.get(url)
+        response_string = response.content
+        card = json.loads(response_string)
+
+        if response.status_code != requests.codes["✓"]:
+            raise RuntimeError(card["details"])
+        
+        return card
 
 
 # result = requests.get("https://api.scryfall.com/cards/random")

@@ -1,15 +1,17 @@
 import aiml
+from requests.exceptions import HTTPError
 
 from scryfall_api import Scryfall
 
 class Chatbot:
     def __init__(self):
         self.set_kernel()
+        self.scryfall_api = Scryfall()
 
     def is_command(self, user_input):
         return user_input[0] == "#"
 
-    def get_command_dict(self, user_input):
+    def get_command(self, user_input):
         command_dict = {}
         command = user_input[1:].split("$")[0]
         parameter = user_input[1:].split("$")[1]
@@ -17,20 +19,18 @@ class Chatbot:
         command_dict["parameter"] = parameter
         return command_dict
 
-
     def set_kernel(self):
         self.kernel = aiml.Kernel()
         self.kernel.setTextEncoding(None)
         self.kernel.bootstrap(learnFiles="aiml-mtg.xml")
 
-
     def run(self):
-        print("Welcome , welcome, to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
+        print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
 
         while True:
             try:
                 user_input = input("> ")
-            except (KeyboardInterrupt, EOFError) as e:
+            except (KeyboardInterrupt, EOFError):
                 print("Bye!")
                 break
 
@@ -40,16 +40,29 @@ class Chatbot:
             agent = "aiml"
             if agent == "aiml":
                 answer = self.kernel.respond(user_input)
-
+            if not answer:
+                print("I don't understand")
             if self.is_command(answer):
-                command_dict = self.get_command_dict(answer)
-                if command_dict["command"] == "example":
-                    # do api thing
-                    print(command_dict["parameter"])
+                command = self.get_command(answer)
+                if command["command"] == "quit":
+                    print(command["parameter"])
+                    break
+
+                if command["command"] == "describe":
+                    try:
+                        card = self.scryfall_api.get_card(command["parameter"])
+                        print(f'{card["name"]}:')
+                        print(card["mana_cost"])
+                        print(card["type_line"])
+                        print(card["oracle_text"])
+                    except RuntimeError as e:
+                        print(f'{e}')
+
+                if command["command"] == "default":
+                    print(f"No match, what is {command['parameter']}?")
             else:
                 print(answer)
 
-Scryfall().get_card("divination")
 
 Chatbot().run()
 

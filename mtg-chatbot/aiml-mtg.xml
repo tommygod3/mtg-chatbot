@@ -25,8 +25,38 @@
 <category> <pattern> I AM FINE * </pattern>
   <template><srai>I AM FINE</srai></template> </category>
 
-<category><pattern> BYE </pattern>
-  <template>#0$See ya later Scuttlegator.</template></category>
+<category>
+  <pattern>I AM *</pattern>
+  <template>
+      Hello <set name = "username"><star/></set>
+  </template>  
+</category>
+
+<category> <pattern> MY NAME IS * </pattern>
+  <template><srai>I AM <star index="1"/></srai></template> </category>
+
+<category>
+  <pattern>WHAT IS MY NAME</pattern>
+  <template>
+    <condition name = "username">
+    <li value="">Dunno.</li>
+    <li>Your name is <get name = "username"/>, did you forget?</li>
+    </condition>
+  </template>  
+</category>
+
+<category> <pattern> WHO AM I </pattern>
+  <template><srai>WHAT IS MY NAME</srai></template> </category>
+
+<category>
+  <pattern>BYE</pattern>
+  <template>
+    <condition name = "username">
+    <li value="">#quit$See ya later Scuttlegator.</li>
+    <li>#quit$See you soon <get name = "username"/>.</li>
+    </condition>
+  </template> 
+</category>
 
 <category> <pattern> BYE * </pattern>
   <template><srai>BYE</srai></template> </category>
@@ -43,8 +73,23 @@
 <category><pattern> QUIT </pattern>
   <template><srai>BYE</srai></template></category>
 
-<category> <pattern> THANKS </pattern>
-  <template>You're welcome!</template></category>
+<category>
+  <pattern>MY FAVOURITE CARD IS *</pattern>
+  <template>
+      Hello <set name = "username"><star/></set>
+  </template>  
+</category>
+
+<category>
+  <pattern>THANKS</pattern>
+  <template>
+      <random>
+        <li> You're welcome! </li>
+        <li> No problemo </li>
+        <li> Ayyy forget about it. </li>
+      </random>
+  </template>
+</category>
 
 <category> <pattern> THANKS * </pattern>
   <template><srai>THANKS</srai></template> </category>
@@ -55,17 +100,14 @@
 <category> <pattern> THANK YOU * </pattern>
   <template><srai>THANK YOU</srai></template> </category>
 
-<category> <pattern> CHEERS * </pattern>
+<category> <pattern> CHEERS </pattern>
   <template>No problemo</template></category>
 
-<category> <pattern> CHEERS </pattern>
+<category> <pattern> CHEERS * </pattern>
   <template><srai>CHEERS</srai></template> </category>
 
 <category> <pattern> WHAT IS YOUR FAVOURITE CARD </pattern>
   <template>Counterspell ;)</template> </category>
-
-<category> <pattern> WHAT IS YOUR FAVOURITE * CARD </pattern>
-  <template><srai>WHAT IS YOUR FAVOURITE CARD</srai></template> </category>
 
 <!--- Explaining Magic: The Gathering -->
 <category> <pattern> WHAT IS MAGIC </pattern>
@@ -167,7 +209,7 @@
 <!--- Scryfall API -->
 <!-- Describe cards -->
 <category><pattern> WHAT IS * </pattern>
-  <template>#1$<star index="1"/></template></category>
+  <template>#describe$<star index="1"/></template></category>
 
 <category><pattern> DESCRIBE * </pattern>
   <template><srai>WHAT IS <star/></srai></template></category>
@@ -178,6 +220,6 @@
 
 <!-- Default reaction -->
 <category><pattern> * </pattern>
-  <template>#99$<star index="1"/></template></category>
+  <template>#default$<star index="1"/></template></category>
 
 </aiml>
