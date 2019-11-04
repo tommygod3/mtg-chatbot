@@ -56,7 +56,6 @@ class Chatbot:
         print(card["type_line"])
         print(card["oracle_text"])
 
-
     def print_colour(self, name):
         try:
             card = self.scryfall_api.get_card(name)
@@ -91,19 +90,18 @@ class Chatbot:
     def print_favourite(self, name):
         try:
             card = self.scryfall_api.get_card(name)
+            print(f"{card['name']}? Cool")
         except RuntimeError as e:
             print(f'{e}')
 
-        print(f"{card['name']}? Cool")
-    
     def show_card(self, name):
         try:
             card = self.scryfall_api.get_card(name)
+            response = requests.get(card["image_uris"]["large"])
+            img = Image.open(BytesIO(response.content))
+            img.show()
         except RuntimeError as e:
             print(f'{e}')
-        response = requests.get(card["image_uris"]["large"])
-        img = Image.open(BytesIO(response.content))
-        img.show()
 
     def show_card_random(self):
         card = self.scryfall_api.random_card()
@@ -117,11 +115,43 @@ class Chatbot:
         tfidf_matrix = TfidfVectorizer().fit_transform(corpus)
         similarities = cosine_similarity(tfidf_matrix, tfidf_matrix[-1])[:-1]
         similarities = list(similarities.flatten())
-        if max(similarities) < 0.1:
+        if max(similarities) < 0.6:
             print("I am sorry, I do not understand :(")
         else:
             most_similar_index = similarities.index(max(similarities))
-            print(self.kernel.respond(self.patterns[most_similar_index]))
+            self.handle_answer(self.kernel.respond(self.patterns[most_similar_index]))
+
+    def handle_answer(self, answer):
+        if not answer:
+            print("I don't understand :(")
+        if self.is_command(answer):
+            command, parameter = self.get_command_and_parameter(answer)
+            if command == "quit":
+                print(parameter)
+                return True
+
+            if command == "describe":
+                self.print_description(parameter)
+            if command == "describe_random":
+                self.print_description_random()
+            if command == "colour":
+                self.print_colour(parameter)
+            if command == "cost":
+                self.print_cost(parameter)
+            if command == "type":
+                self.print_type(parameter)
+            if command == "text":
+                self.print_text(parameter)
+            if command == "favourite":
+                self.print_favourite(parameter)
+            if command == "show":
+                self.show_card(parameter)
+            if command == "show_random":
+                self.show_card_random()
+            if command == "default":
+                self.similarity(parameter)
+        else:
+            print(answer)
 
     def run(self):
         print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
@@ -139,36 +169,9 @@ class Chatbot:
             agent = "aiml"
             if agent == "aiml":
                 answer = self.kernel.respond(user_input)
-            if not answer:
-                print("I don't understand :(")
-            if self.is_command(answer):
-                command, parameter = self.get_command_and_parameter(answer)
-                if command == "quit":
-                    print(parameter)
-                    break
+            
+            if self.handle_answer(answer):
+                break
 
-                if command == "describe":
-                    self.print_description(parameter)
-                if command == "describe_random":
-                    self.print_description_random()
-                if command == "colour":
-                    self.print_colour(parameter)
-                if command == "cost":
-                    self.print_cost(parameter)
-                if command == "type":
-                    self.print_type(parameter)
-                if command == "text":
-                    self.print_text(parameter)
-                if command == "favourite":
-                    self.print_favourite(parameter)
-                if command == "show":
-                    self.show_card(parameter)
-                if command == "show_random":
-                    self.show_card_random()
-
-                if command == "default":
-                    self.similarity(parameter)
-            else:
-                print(answer)
 
 Chatbot("aiml-mtg.xml").run()
