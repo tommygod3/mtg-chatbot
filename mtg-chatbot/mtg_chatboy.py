@@ -1,14 +1,22 @@
-import aiml, requests
+import aiml, requests, sys, os
+import xml.etree.ElementTree as ET
 from PIL import Image
 from io import BytesIO
 from requests.exceptions import HTTPError
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 from scryfall import Scryfall
 
 class Chatbot:
-    def __init__(self):
+    def __init__(self, aiml_filename):
+        self.aiml_filename = self.get_full_filename_path(aiml_filename)
         self.set_kernel()
         self.scryfall_api = Scryfall()
+        self.set_patterns()
+
+    def get_full_filename_path(self, filename):
+        return f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/{filename}"
 
     def is_command(self, user_input):
         return user_input[0] == "#"
@@ -21,7 +29,15 @@ class Chatbot:
     def set_kernel(self):
         self.kernel = aiml.Kernel()
         self.kernel.setTextEncoding(None)
-        self.kernel.bootstrap(learnFiles="aiml-mtg.xml")
+        self.kernel.bootstrap(learnFiles=self.aiml_filename)
+
+    def set_patterns(self):
+        self.patterns = []
+        tree = ET.parse(self.aiml_filename)
+        all_patterns = tree.findall("*/pattern")
+        for pattern in all_patterns:
+            if "*" not in pattern.text:
+                self.patterns.append(pattern.text)
 
     def print_description(self, name):
         try:
@@ -34,14 +50,12 @@ class Chatbot:
             print(f'{e}')
 
     def print_description_random(self):
-        try:
-            card = self.scryfall_api.random_card()
-            print(f'{card["name"]}:')
-            print(card["mana_cost"])
-            print(card["type_line"])
-            print(card["oracle_text"])
-        except RuntimeError as e:
-            print(f'{e}')
+        card = self.scryfall_api.random_card()
+        print(f'{card["name"]}:')
+        print(card["mana_cost"])
+        print(card["type_line"])
+        print(card["oracle_text"])
+
 
     def print_colour(self, name):
         try:
@@ -92,13 +106,22 @@ class Chatbot:
         img.show()
 
     def show_card_random(self):
-        try:
-            card = self.scryfall_api.random_card()
-        except RuntimeError as e:
-            print(f'{e}')
+        card = self.scryfall_api.random_card()
         response = requests.get(card["image_uris"]["large"])
         img = Image.open(BytesIO(response.content))
         img.show()
+
+    def similarity(self, phrase):
+        corpus = self.patterns[:]
+        corpus.append(phrase)
+        tfidf_matrix = TfidfVectorizer().fit_transform(corpus)
+        similarities = cosine_similarity(tfidf_matrix, tfidf_matrix[-1])[:-1]
+        similarities = list(similarities.flatten())
+        if max(similarities) < 0.1:
+            print("I am sorry, I do not understand :(")
+        else:
+            most_similar_index = similarities.index(max(similarities))
+            print(self.kernel.respond(self.patterns[most_similar_index]))
 
     def run(self):
         print("Welcome to the Magic: The Gathering chatbot! Ask me questions about the game of Magic, as well as cards in the game! I can describe and show you cards.")
@@ -144,8 +167,8 @@ class Chatbot:
                     self.show_card_random()
 
                 if command == "default":
-                    print(f"No match, what is {parameter}?")
+                    self.similarity(parameter)
             else:
                 print(answer)
 
-Chatbot().run()
+Chatbot("aiml-mtg.xml").run()
