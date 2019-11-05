@@ -269,6 +269,16 @@
 </category>
 
 <category>
+  <pattern>WHAT IS THE PRICE OF MY FAVOURITE CARD</pattern>
+  <template>
+    <condition name = "favourite_card">
+    <li value="">I don't know what your favourite card is!</li>
+    <li><srai>WHAT IS THE PRICE OF <get name = "favourite_card"/></srai></li>
+    </condition>
+  </template>  
+</category>
+
+<category>
   <pattern>SHOW ME MY FAVOURITE CARD</pattern>
   <template>
     <condition name = "favourite_card">
@@ -305,6 +315,10 @@
 
 <category> <pattern> WHAT DOES * DO</pattern>
   <template>#text$<star index="1"/></template></category>
+
+<!-- Price cards -->
+<category> <pattern> WHAT IS THE PRICE OF * </pattern>
+  <template>#price$<star index="1"/></template></category>
 
 <!-- Show cards -->
 <category><pattern> SHOW ME A RANDOM CARD </pattern>

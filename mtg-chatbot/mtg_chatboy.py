@@ -87,6 +87,17 @@ class Chatbot:
         except RuntimeError as e:
             print(f'{e}')
 
+    def print_price(self, name):
+        try:
+            card = self.scryfall_api.get_card(name)
+            price = card['prices']['eur']
+            if price:
+                print(f"{price} EUR")
+            else:
+                print(f"I have no price data for {name}")
+        except RuntimeError as e:
+            print(f'{e}')
+
     def print_favourite(self, name):
         try:
             card = self.scryfall_api.get_card(name)
@@ -142,6 +153,8 @@ class Chatbot:
                 self.print_type(parameter)
             if command == "text":
                 self.print_text(parameter)
+            if command == "price":
+                self.print_price(parameter)
             if command == "favourite":
                 self.print_favourite(parameter)
             if command == "show":
