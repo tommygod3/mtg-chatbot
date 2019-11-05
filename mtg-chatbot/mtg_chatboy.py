@@ -43,47 +43,78 @@ class Chatbot:
         try:
             card = self.scryfall_api.get_card(name)
             print(f'{card["name"]}:')
-            print(card["mana_cost"])
-            print(card["type_line"])
-            print(card["oracle_text"])
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    print(face["mana_cost"])
+                    print(face["type_line"])
+                    print(face["oracle_text"])
+            else:
+                print(card["mana_cost"])
+                print(card["type_line"])
+                print(card["oracle_text"])
         except RuntimeError as e:
             print(f'{e}')
 
     def print_description_random(self):
         card = self.scryfall_api.random_card()
         print(f'{card["name"]}:')
-        print(card["mana_cost"])
-        print(card["type_line"])
-        print(card["oracle_text"])
+        if "card_faces" in card:
+            for face in card["card_faces"]:
+                print(face["mana_cost"])
+                print(face["type_line"])
+                print(face["oracle_text"])
+        else:
+            print(card["mana_cost"])
+            print(card["type_line"])
+            print(card["oracle_text"])
 
     def print_colour(self, name):
         try:
             card = self.scryfall_api.get_card(name)
-            if not card["colors"]:
-                print(f"{card['name']} is colourless!")
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    if not face["colors"]:
+                        print(f"{face['name']} is colourless!")
+                    else:
+                        print(face["colors"])
             else:
-                print(card["colors"])
+                if not card["colors"]:
+                    print(f"{card['name']} is colourless!")
+                else:
+                    print(card["colors"])
         except RuntimeError as e:
             print(f'{e}')
 
     def print_cost(self, name):
         try:
             card = self.scryfall_api.get_card(name)
-            print(card["mana_cost"])
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    print(face["mana_cost"])
+            else:
+                print(card["mana_cost"])
         except RuntimeError as e:
             print(f'{e}')
 
     def print_type(self, name):
         try:
             card = self.scryfall_api.get_card(name)
-            print(card["type_line"])
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    print(face["type_line"])
+            else:
+                print(card["type_line"])
         except RuntimeError as e:
             print(f'{e}')
 
     def print_text(self, name):
         try:
             card = self.scryfall_api.get_card(name)
-            print(card["oracle_text"])
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    print(face["oracle_text"])
+            else:
+                print(card["oracle_text"])
         except RuntimeError as e:
             print(f'{e}')
 
@@ -108,17 +139,29 @@ class Chatbot:
     def show_card(self, name):
         try:
             card = self.scryfall_api.get_card(name)
-            response = requests.get(card["image_uris"]["large"])
-            img = Image.open(BytesIO(response.content))
-            img.show()
+            if "card_faces" in card:
+                for face in card["card_faces"]:
+                    response = requests.get(face["image_uris"]["large"])
+                    img = Image.open(BytesIO(response.content))
+                    img.show()
+            else:
+                response = requests.get(card["image_uris"]["large"])
+                img = Image.open(BytesIO(response.content))
+                img.show()
         except RuntimeError as e:
             print(f'{e}')
 
     def show_card_random(self):
         card = self.scryfall_api.random_card()
-        response = requests.get(card["image_uris"]["large"])
-        img = Image.open(BytesIO(response.content))
-        img.show()
+        if "card_faces" in card:
+            for face in card["card_faces"]:
+                response = requests.get(face["image_uris"]["large"])
+                img = Image.open(BytesIO(response.content))
+                img.show()
+        else:
+            response = requests.get(card["image_uris"]["large"])
+            img = Image.open(BytesIO(response.content))
+            img.show()
 
     def similarity(self, phrase):
         corpus = self.patterns[:]
