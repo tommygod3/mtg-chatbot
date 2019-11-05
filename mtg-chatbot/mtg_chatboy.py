@@ -6,13 +6,13 @@ from requests.exceptions import HTTPError
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-from scryfall import Scryfall
+import scrython
+from scrython.foundation import ScryfallError
 
 class Chatbot:
     def __init__(self, aiml_filename):
         self.aiml_filename = self.get_full_filename_path(aiml_filename)
         self.set_kernel()
-        self.scryfall_api = Scryfall()
         self.set_patterns()
 
     def get_full_filename_path(self, filename):
@@ -41,127 +41,121 @@ class Chatbot:
 
     def print_description(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            print(f'{card["name"]}:')
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    print(face["mana_cost"])
-                    print(face["type_line"])
-                    print(face["oracle_text"])
-            else:
-                print(card["mana_cost"])
-                print(card["type_line"])
-                print(card["oracle_text"])
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            print(f'{card.name()}:')
+            print(card.mana_cost())
+            print(card.type_line())
+            print(card.oracle_text())
+        except ScryfallError as e:
             print(f'{e}')
-
-    def print_description_random(self):
-        card = self.scryfall_api.random_card()
-        print(f'{card["name"]}:')
-        if "card_faces" in card:
-            for face in card["card_faces"]:
+        except KeyError:
+            for face in card.card_faces():
                 print(face["mana_cost"])
                 print(face["type_line"])
                 print(face["oracle_text"])
-        else:
-            print(card["mana_cost"])
-            print(card["type_line"])
-            print(card["oracle_text"])
+
+    def print_description_random(self):
+        try:
+            card = scrython.cards.Random()
+            print(f'{card.name()}:')
+            print(card.mana_cost())
+            print(card.type_line())
+            print(card.oracle_text())
+        except KeyError:
+            for face in card.card_faces():
+                print(face["mana_cost"])
+                print(face["type_line"])
+                print(face["oracle_text"])
 
     def print_colour(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    if not face["colors"]:
-                        print(f"{face['name']} is colourless!")
-                    else:
-                        print(face["colors"])
+            card = scrython.cards.Named(exact=name)
+            if not card.colors():
+                print(f"{card.name()} is colourless!")
             else:
-                if not card["colors"]:
-                    print(f"{card['name']} is colourless!")
-                else:
-                    print(card["colors"])
-        except RuntimeError as e:
+                print(card.colors())
+        except ScryfallError as e:
             print(f'{e}')
+        except KeyError:
+            for face in card.card_faces():
+                if not face["colors"]:
+                    print(f"{face['name']} is colourless!")
+                else:
+                    print(face["colors"])
 
     def print_cost(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    print(face["mana_cost"])
-            else:
-                print(card["mana_cost"])
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            print(card.mana_cost())
+        except ScryfallError as e:
             print(f'{e}')
+        except KeyError:
+            for face in card.card_faces():
+                print(face["mana_cost"])
 
     def print_type(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    print(face["type_line"])
-            else:
-                print(card["type_line"])
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            print(card.type_line())
+        except ScryfallError as e:
             print(f'{e}')
+        except KeyError:
+            for face in card.card_faces():
+                print(face["type_line"])
 
     def print_text(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    print(face["oracle_text"])
-            else:
-                print(card["oracle_text"])
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            print(card.oracle_text())
+        except ScryfallError as e:
             print(f'{e}')
+        except KeyError:
+            for face in card.card_faces():
+                print(face["oracle_text"])
 
     def print_price(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            price = card['prices']['eur']
+            card = scrython.cards.Named(exact=name)
+            price = card.prices("eur")
             if price:
                 print(f"{price} EUR")
             else:
                 print(f"I have no price data for {name}")
-        except RuntimeError as e:
+        except ScryfallError as e:
             print(f'{e}')
 
     def print_favourite(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            print(f"{card['name']}? Cool")
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            print(f"{card.name()}? Cool")
+        except ScryfallError as e:
             print(f'{e}')
 
     def show_card(self, name):
         try:
-            card = self.scryfall_api.get_card(name)
-            if "card_faces" in card:
-                for face in card["card_faces"]:
-                    response = requests.get(face["image_uris"]["large"])
-                    img = Image.open(BytesIO(response.content))
-                    img.show()
-            else:
-                response = requests.get(card["image_uris"]["large"])
-                img = Image.open(BytesIO(response.content))
-                img.show()
-        except RuntimeError as e:
+            card = scrython.cards.Named(exact=name)
+            response = requests.get(card.image_uris()["large"])
+            img = Image.open(BytesIO(response.content))
+            img.show()
+        except ScryfallError as e:
             print(f'{e}')
-
-    def show_card_random(self):
-        card = self.scryfall_api.random_card()
-        if "card_faces" in card:
-            for face in card["card_faces"]:
+        except KeyError:
+            for face in card.card_faces():
                 response = requests.get(face["image_uris"]["large"])
                 img = Image.open(BytesIO(response.content))
                 img.show()
-        else:
-            response = requests.get(card["image_uris"]["large"])
+
+    def show_card_random(self):
+        try:
+            card = scrython.cards.Random()
+            response = requests.get(card.image_uris()["large"])
             img = Image.open(BytesIO(response.content))
             img.show()
+        except KeyError:
+            for face in card.card_faces():
+                response = requests.get(face["image_uris"]["large"])
+                img = Image.open(BytesIO(response.content))
+                img.show()
 
     def similarity(self, phrase):
         corpus = self.patterns[:]

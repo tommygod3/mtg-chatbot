@@ -18,13 +18,19 @@ dependencies:
   - joblib
   - jpeg
   - lazy-object-proxy
+  - libedit
+  - libffi
+  - libgcc-ng
+  - libgfortran-ng
   - libpng
+  - libstdcxx-ng
   - libtiff
   - mccabe
   - mkl
   - mkl-service
   - mkl_fft
   - mkl_random
+  - ncurses
   - numpy
   - numpy-base
   - olefile
@@ -36,6 +42,7 @@ dependencies:
   - pyopenssl
   - pysocks
   - python
+  - readline
   - requests
   - scikit-learn
   - scipy
@@ -51,5 +58,12 @@ dependencies:
   - zstd
   - pip:
     - aiml
+    - aiohttp
+    - async-timeout
+    - asyncio
+    - attrs
+    - multidict
+    - scrython
+    - yarl
 prefix: /home/vagrant/miniconda3/envs/mtg
 
