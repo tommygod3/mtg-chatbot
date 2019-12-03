@@ -270,6 +270,7 @@ class Chatbot:
         while True:
             try:
                 user_input = input("> ")
+                user_input = user_input.split("?")[0]
             except (KeyboardInterrupt, EOFError):
                 print("Bye!")
                 break
