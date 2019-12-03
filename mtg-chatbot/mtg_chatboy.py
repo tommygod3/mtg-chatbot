@@ -2,18 +2,24 @@ import aiml, requests, sys, os
 import xml.etree.ElementTree as ET
 from PIL import Image
 from io import BytesIO
-from requests.exceptions import HTTPError
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import cv2
+import tensorflow as tf
+from tensorflow.keras import models, backend, layers
+import urllib.request
+import numpy
 
 import scrython
 from scrython.foundation import ScryfallError
 
 class Chatbot:
-    def __init__(self, aiml_filename):
+    def __init__(self, aiml_filename, color_model, type_model):
         self.aiml_filename = self.get_full_filename_path(aiml_filename)
         self.set_kernel()
         self.set_patterns()
+        self.load_image_models(color_model, type_model)
+        self.set_classnames()
 
     def get_full_filename_path(self, filename):
         return f"{os.path.dirname(os.path.realpath(sys.argv[0]))}/{filename}"
@@ -38,6 +44,57 @@ class Chatbot:
         for pattern in all_patterns:
             if "*" not in pattern.text:
                 self.patterns.append(pattern.text)
+
+    def load_image_models(self, color_model, type_model):
+        self.color_model = models.load_model(color_model)
+        self.type_model = models.load_model(type_model)
+
+    def set_classnames(self):
+        self.color_classnames = ["Black", "Blue", "Colorless", "Green", "Red",
+                            "White"]
+
+        self.type_classnames = ["Artifact",
+                        "Creature",
+                        "Enchantment",
+                        "InstantSorcery",
+                        "Land",
+                        "Planeswalker"]
+
+    def print_image_colour(self, name):
+        print(self.run_image_model(name, self.color_model, self.color_classnames))
+
+    def print_image_type(self, name):
+        print(self.run_image_model(name, self.type_model, self.type_classnames))
+
+    def run_image_model(self, name, model, classnames):
+        parsed_name = None
+        for word in name.split(" "):
+            if "jpg" in word or "png" in word:
+                parsed_name = word
+        if not parsed_name:
+            return "Input is neither a valid file nor url"
+        if os.path.exists(parsed_name):
+            raw_image = cv2.imread(parsed_name)
+        else:
+            try:
+                file_to_delete = parsed_name.split("/")[-1]
+                urllib.request.urlretrieve(parsed_name, file_to_delete)
+                raw_image = cv2.imread(file_to_delete)
+                os.remove(file_to_delete)
+            except Exception:
+                return "Input is neither a valid file nor url"
+        img_rows = 150
+        img_cols = 150
+        color_channels = 3
+        input_shape = (img_rows, img_cols, color_channels)
+        scaled_image = cv2.resize(raw_image, dsize=(img_rows, img_cols), interpolation=cv2.INTER_CUBIC)
+        cv2.imwrite("scaled.jpg", scaled_image)
+        scaled_image = scaled_image/255
+        image_array = scaled_image.reshape(1, img_rows, img_cols, color_channels)
+
+        predictions = model.predict(image_array)
+        
+        return classnames[numpy.argmax(predictions)]
 
     def print_description(self, name):
         try:
@@ -178,6 +235,10 @@ class Chatbot:
                 print(parameter)
                 return True
 
+            if command == "image_colour":
+                self.print_image_colour(parameter)
+            if command == "image_type":
+                self.print_image_type(parameter)
             if command == "describe":
                 self.print_description(parameter)
             if command == "describe_random":
@@ -219,9 +280,12 @@ class Chatbot:
             agent = "aiml"
             if agent == "aiml":
                 answer = self.kernel.respond(user_input)
+                answer = answer.replace("  #default$", ".")
             
             if self.handle_answer(answer):
                 break
 
 
-Chatbot("aiml-mtg.xml").run()
+Chatbot(aiml_filename="aiml-mtg.xml",
+        color_model="../mtg-image-classify/classify/color_model.h5",
+        type_model="../mtg-image-classify/classify/type_model.h5").run()

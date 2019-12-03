@@ -289,6 +289,14 @@
 </category>
 
 
+<!--- CNN Image Classification -->
+<!-- Color -->
+<category> <pattern> WHAT COLOUR WOULD * </pattern>
+  <template>#image_colour$<star index="1"/></template></category>
+<!-- Type -->
+<category> <pattern> WHAT TYPE WOULD * </pattern>
+  <template>#image_type$<star index="1"/></template></category>
+
 <!--- Scryfall API -->
 <!-- Describe cards -->
 <category><pattern> DESCRIBE A RANDOM CARD </pattern>
