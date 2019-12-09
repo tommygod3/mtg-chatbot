@@ -290,12 +290,8 @@
 
 
 <!--- CNN Image Classification -->
-<!-- Color -->
-<category> <pattern> WHAT COLOUR WOULD * </pattern>
-  <template>#image_colour$<star index="1"/></template></category>
-<!-- Type -->
-<category> <pattern> WHAT TYPE WOULD * </pattern>
-  <template>#image_type$<star index="1"/></template></category>
+<category> <pattern> WHAT WOULD * </pattern>
+  <template>#image_classification$<star index="1"/></template></category>
 
 <!--- Scryfall API -->
 <!-- Describe cards -->
