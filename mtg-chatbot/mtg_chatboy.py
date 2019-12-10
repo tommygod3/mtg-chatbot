@@ -1,4 +1,4 @@
-import aiml, requests, sys, os
+import aiml, requests, sys, os, math
 import xml.etree.ElementTree as ET
 from PIL import Image
 from io import BytesIO
@@ -53,7 +53,7 @@ class Chatbot:
         self.classnames = ['Artifact', 'Black', 'Blue', 'Colorless', 'Creature', 'Enchantment', 'Green', 'InstantSorcery', 'Land', 'Planeswalker', 'Red', 'White']
 
     def print_image_model_result(self, name):
-        print(self.run_image_model(name))
+        print(*self.run_image_model(name))
 
     def run_image_model(self, name):
         parsed_name = None
@@ -61,7 +61,7 @@ class Chatbot:
             if "jpg" in word or "png" in word:
                 parsed_name = word
         if not parsed_name:
-            return "Input is neither a valid file nor url"
+            return ["Input is not a jpg or a png file"]
         if os.path.exists(parsed_name):
             raw_image = cv2.imread(parsed_name)
         else:
@@ -70,31 +70,65 @@ class Chatbot:
                 urllib.request.urlretrieve(parsed_name, file_to_delete)
                 raw_image = cv2.imread(file_to_delete)
                 os.remove(file_to_delete)
-            except Exception:
-                return "Input is neither a valid file nor url"
+            except Exception as e:
+                return ["Input is neither a valid file nor url"]
         img_rows = 150
         img_cols = 150
         color_channels = 3
         input_shape = (img_rows, img_cols, color_channels)
         scaled_image = cv2.resize(raw_image, dsize=(img_rows, img_cols), interpolation=cv2.INTER_CUBIC)
-        # debug:
-        cv2.imwrite("scaled.jpg", scaled_image)
         scaled_image = scaled_image/255
         image_array = scaled_image.reshape(1, img_rows, img_cols, color_channels)
 
         predictions = self.model.predict(image_array)
-        confident_predictions = predictions[0] > 0.4
-
-        for index, classname in enumerate(self.classnames):
-            print(f"{classname}: {predictions[0][index]}")
         
-        predicted_classes = []
-        for index, prediction in enumerate(confident_predictions):
-            if prediction:
-                predicted_classes.append(self.classnames[index])
+        colors, types = self.get_class_predictions(predictions[0])
+        
+        probable_colors = self.trim_predictions(colors)
+        probable_types = self.trim_predictions(types)
+        
+        predicted_classes = [classname for classname in probable_colors]
+        for card_type in probable_types:
+            predicted_classes.append(card_type)
 
+        if not predicted_classes:
+            return "I can't tell what this is :("
         
         return predicted_classes
+
+    def get_class_predictions(self, predictions):
+        colors = {
+            "Black": predictions[1],
+            "Blue": predictions[2],
+            "Colorless": predictions[3],
+            "Green": predictions[6],
+            "Red": predictions[10],
+            "White": predictions[11]
+        }
+        types = {
+            "Artifact": predictions[0],
+            "Creature": predictions[4],
+            "Enchantment": predictions[5],
+            "Instant/Sorcery": predictions[7],
+            "Land": predictions[8],
+            "Planeswalker": predictions[9]
+        }
+        return colors, types
+
+    def trim_predictions(self, predictions):
+        likely_predictions = {}
+        probability_threshold = 0.7
+        found = False
+        while not found:
+            if likely_predictions:
+                found = True
+            probability_threshold -= 0.1
+            if math.isclose(probability_threshold, 0.1):
+                return likely_predictions
+            for category, probability in predictions.items():
+                if probability >= probability_threshold:
+                    likely_predictions[category] = probability
+        return likely_predictions
 
     def print_description(self, name):
         try:
@@ -286,4 +320,4 @@ class Chatbot:
 
 
 Chatbot(aiml_filename="aiml-mtg.xml",
-        model="../../mtg-image-classify/classify/over_model.h5").run()
+        model="../../mtg-image-classify/classify/model.h5").run()
