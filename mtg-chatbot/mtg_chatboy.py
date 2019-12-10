@@ -58,7 +58,7 @@ class Chatbot:
     def run_image_model(self, name):
         parsed_name = None
         for word in name.split(" "):
-            if "jpg" in word or "png" in word:
+            if "jpg" in word or "png" in word or "jpeg" in word:
                 parsed_name = word
         if not parsed_name:
             return ["Input is not a jpg or a png file"]
@@ -92,7 +92,7 @@ class Chatbot:
             predicted_classes.append(card_type)
 
         if not predicted_classes:
-            return "I can't tell what this is :("
+            return ["I can't tell what this is :("]
         
         return predicted_classes
 
