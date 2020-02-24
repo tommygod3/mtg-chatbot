@@ -331,6 +331,46 @@
 <category> <pattern> SHOW ME *</pattern>
   <template>#show$<star index="1"/></template></category>
 
+<!-- FOL model interface -->
+<category><pattern> * DRAW * </pattern>
+  <template>#draw$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * DREW * </pattern>
+  <template>#draw$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * CAST * </pattern>
+  <template>#cast$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * CASTED * </pattern>
+  <template>#cast$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * PLAY * </pattern>
+  <template>#cast$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * PLAYED * </pattern>
+  <template>#cast$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> ARE THERE ANY CARDS IN *</pattern>
+  <template>#cards_in_zone$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> ARE ALL CARDS IN *</pattern>
+  <template>#all_cards_in$<star index="1"/></template></category>
+
+<category><pattern> WHICH CARDS ARE IN * </pattern>
+  <template>#which_cards_in$<star index="1"/></template></category>
+
+<category><pattern> WHICH CARDS ARE ON * </pattern>
+  <template>#which_cards_in$<star index="1"/></template></category>
+
+<category><pattern> WHAT CARDS ARE IN * </pattern>
+  <template>#which_cards_in$<star index="1"/></template></category>
+
+<category><pattern> WHAT CARDS ARE ON * </pattern>
+  <template>#which_cards_in$<star index="1"/></template></category>
+
+<category><pattern> REMOVE * FROM * </pattern>
+  <template>#remove$<star index="1"/>$<star index="2"/></template></category>
+
 <!-- Default reaction -->
 <category><pattern> * </pattern>
   <template>#default$<star index="1"/></template></category>
