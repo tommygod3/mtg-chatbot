@@ -413,6 +413,22 @@ class Chatbot:
                 if relationship[0] in to_remove:
                     self.valuation["be_in"].remove(relationship)
                     return False
+    
+    def destroy(self, player, card_name):
+        remove_from_battlefield_result = self.remove(card_name, f"{player} battlefield")
+        if remove_from_battlefield_result:
+            print(f"{remove_from_battlefield_result} on battlefield")
+            return
+
+        self.add_to_zone(player, "graveyard", card_name)
+
+    def exile(self, player, card_name):
+        remove_from_battlefield_result = self.remove(card_name, f"{player} battlefield")
+        if remove_from_battlefield_result:
+            print(f"{remove_from_battlefield_result} on battlefield")
+            return
+
+        self.add_to_zone(player, "exile", card_name)
 
     def handle_answer(self, answer):
         if not answer:
@@ -457,6 +473,10 @@ class Chatbot:
                 self.get_cards_in_zone(parameters[0])
             if command == "remove":
                 self.remove(parameters[0], parameters[1])
+            if command == "destroy":
+                self.destroy(parameters[0], parameters[1])
+            if command == "exile":
+                self.exile(parameters[0], parameters[1])
 
 
 
