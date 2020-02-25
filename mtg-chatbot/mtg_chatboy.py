@@ -11,6 +11,7 @@ import urllib.request
 import numpy
 import nltk
 import pickle
+import random
 
 import scrython
 from scrython.foundation import ScryfallError
@@ -25,6 +26,7 @@ class Chatbot:
         self.load_nltk(grammar_file)
 
     def load_nltk(self, grammar_file):
+        random.seed()
         valuation_string = """
         card => {}
         my_hand => h1
@@ -35,6 +37,8 @@ class Chatbot:
         opp_exile => e2
         my_battlefield => b1
         opp_battlefield => b2
+        my_deck => d1
+        opp_deck => d2
         be_in => {}
         """
         self.valuation = nltk.Valuation.fromstring(valuation_string)
@@ -297,6 +301,7 @@ class Chatbot:
             "hand": "hand",
             "graveyard": "graveyard",
             "exile": "exile",
+            "deck": "deck",
             "battlefield": "battlefield"
         }
         for term, zone in vocabulary.items():
@@ -362,8 +367,33 @@ class Chatbot:
             print("That doesn't make sense :(")
             return
         self.add_to_zone(location_input, zone, card_name)
+
+    def draw_random(self, player):
+        ownership = self.translate_ownership(player)
+        if ownership is None:
+            print("That doesn't make sense :(")
+            return
+        location = f"{ownership}_deck"
+
+        if not self.get_cards_in_zone_list(location):
+            print(f"Deck is empty")
+            return
+
+        card_name = random.choice(self.get_cards_in_zone_list(location))
+
+        self.remove(card_name, location)
+        self.add_to_zone(player, "hand", card_name)
     
     def draw_card(self, player, card_name):
+        ownership = self.translate_ownership(player)
+        if ownership is None:
+            print("That doesn't make sense :(")
+            return
+        location = f"{ownership}_deck"
+        if not self.is_card_in_zone(card_name, location):
+            print(f"{card_name} not in deck")
+            return
+        self.remove(card_name, location)
         self.add_to_zone(player, "hand", card_name)
 
     def cast_card(self, player, card_name):
@@ -455,6 +485,13 @@ class Chatbot:
                     if self.real_card_name(card_name) == relationship_card_name:
                         self.valuation["be_in"].remove(relationship)
                         break
+    
+    def get_cards_in_zone_list(self, location):
+        zone_list = []
+        for card, amount in self.get_cards_in_zone(location).items():
+            for _ in range(amount):
+                zone_list.append(card)
+        return zone_list
             
     def remove_all(self, location_input):
         location = self.translate_location(location_input)
@@ -462,10 +499,7 @@ class Chatbot:
             print("That doesn't make sense :(")
             return
        
-        to_remove = []
-        for card, amount in self.get_cards_in_zone(location).items():
-            for _ in range(amount):
-                to_remove.append(card)
+        to_remove = self.get_cards_in_zone_list(location)
 
         for card in to_remove:
             self.remove(card, location)
@@ -540,6 +574,8 @@ class Chatbot:
                 self.add(parameters[0], parameters[1])
             if command == "draw":
                 self.draw_card(parameters[0], parameters[1])
+            if command == "draw_random":
+                self.draw_random(parameters[0])
             if command == "cast":
                 self.cast_card(parameters[0], parameters[1])
             if command == "cards_in_zone":

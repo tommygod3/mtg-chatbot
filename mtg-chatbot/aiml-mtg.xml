@@ -335,6 +335,18 @@
 <category><pattern> ADD * TO * </pattern>
   <template>#add$<star index="1"/>$<star index="2"/></template></category>
 
+<category><pattern> * DRAW A CARD </pattern>
+  <template>#draw_random$<star index="1"/></template></category>
+
+<category><pattern> * DREW A CARD </pattern>
+  <template>#draw_random$<star index="1"/></template></category>
+
+<category><pattern> * DRAW </pattern>
+  <template>#draw_random$<star index="1"/></template></category>
+
+<category><pattern> * DREW </pattern>
+  <template>#draw_random$<star index="1"/></template></category>
+
 <category><pattern> * DRAW * </pattern>
   <template>#draw$<star index="1"/>$<star index="2"/></template></category>
 

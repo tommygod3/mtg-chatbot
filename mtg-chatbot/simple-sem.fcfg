@@ -41,6 +41,8 @@ PropN[-LOC,NUM=sg,SEM=<\P.P(my_exile)>] -> 'my_exile'
 PropN[-LOC,NUM=sg,SEM=<\P.P(opp_exile)>] -> 'opp_exile'
 PropN[-LOC,NUM=sg,SEM=<\P.P(my_battlefield)>] -> 'my_battlefield'
 PropN[-LOC,NUM=sg,SEM=<\P.P(opp_battlefield)>] -> 'opp_battlefield'
+PropN[-LOC,NUM=sg,SEM=<\P.P(my_deck)>] -> 'my_deck'
+PropN[-LOC,NUM=sg,SEM=<\P.P(opp_deck)>] -> 'opp_deck'
 
 Det[NUM=sg,SEM=<\P Q.all x.(P(x) -> Q(x))>] -> 'every'
 Det[NUM=pl,SEM=<\P Q.all x.(P(x) -> Q(x))>] -> 'all'
