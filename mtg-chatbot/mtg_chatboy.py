@@ -1,4 +1,6 @@
-import aiml, requests, sys, os, math
+import pickle, random, re, sys, os, math
+import aiml
+import requests
 import xml.etree.ElementTree as ET
 from PIL import Image
 from io import BytesIO
@@ -10,24 +12,24 @@ from tensorflow.keras import models, backend, layers
 import urllib.request
 import numpy
 import nltk
-import pickle
-import random
-import re
 
 import scrython
 from scrython.foundation import ScryfallError
 
 class Chatbot:
-    def __init__(self, aiml_filename, model, grammar_file):
+    def __init__(self, aiml_filename, model, grammar_file, valuation_file):
+        random.seed()
         self.aiml_filename = Chatbot.get_absolute_path(aiml_filename)
         self.set_kernel()
         self.set_patterns()
         self.load_image_models(model)
         self.set_classnames()
-        self.load_nltk(grammar_file)
+        self.load_nltk(grammar_file, valuation_file)
+    
+    def __del__(self):
+        pickle.dump(self.valuation, open(self.valuation_file, "wb"))
 
-    def load_nltk(self, grammar_file):
-        random.seed()
+    def load_nltk(self, grammar_file, valuation_file):
         valuation_string = """
         card => {}
         my_hand => h1
@@ -42,9 +44,11 @@ class Chatbot:
         opp_deck => d2
         be_in => {}
         """
-        self.valuation = nltk.Valuation.fromstring(valuation_string)
-        #self.valuation = pickle.load(open("save.p", "rb"))
-        #pickle.dump(self.valuation, open("save.p", "wb"))
+        self.valuation_file = valuation_file
+        if os.path.isfile(valuation_file):
+            self.valuation = pickle.load(open(valuation_file, "rb"))
+        else:
+            self.valuation = nltk.Valuation.fromstring(valuation_string)
         self.grammar_file = Chatbot.get_absolute_path(grammar_file)
         self.object_counter = 0
 
@@ -645,11 +649,6 @@ class Chatbot:
                 self.destroy(parameters[0], parameters[1])
             if command == "exile":
                 self.exile(parameters[0], parameters[1])
-
-
-
-
-
             # Similarity
             if command == "default":
                 self.similarity(parameters[0])
@@ -681,4 +680,5 @@ class Chatbot:
 
 Chatbot(aiml_filename="aiml-mtg.xml",
         model="../../mtg-image-classify/classify/model.h5",
-        grammar_file="simple-sem.fcfg").run()
+        grammar_file="simple-sem.fcfg",
+        valuation_file="valuation.p").run()
