@@ -332,6 +332,9 @@
   <template>#show$<star index="1"/></template></category>
 
 <!-- FOL model interface -->
+<category><pattern> ADD * TO * </pattern>
+  <template>#add$<star index="1"/>$<star index="2"/></template></category>
+
 <category><pattern> * DRAW * </pattern>
   <template>#draw$<star index="1"/>$<star index="2"/></template></category>
 

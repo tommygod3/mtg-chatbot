@@ -319,6 +319,9 @@ class Chatbot:
     
     def add_to_zone(self, player, zone, card_name):
         ownership = self.translate_ownership(player)
+        if ownership is None:
+            print("That doesn't make sense :(")
+            return
         location = f"{ownership}_{zone}"
         try:
             object_id = self.encode_card_name(card_name)
@@ -340,6 +343,16 @@ class Chatbot:
             self.valuation["be_in"].add((object_id, self.valuation[location]))
         except ScryfallError as e:
             print(e)
+        
+    def add(self, card_name, location_input):
+        zone = self.translate_zone(location_input)
+        if zone == "battlefield" and not self.is_a_permanent(card_name):
+            print(f"Cannot add {card_name} to battlefield: is not a permanent")
+            return
+        if zone is None:
+            print("That doesn't make sense :(")
+            return
+        self.add_to_zone(location_input, zone, card_name)
     
     def draw_card(self, player, card_name):
         self.add_to_zone(player, "hand", card_name)
@@ -360,6 +373,9 @@ class Chatbot:
         m = nltk.Model(self.valuation.domain, self.valuation)
         ownership = self.translate_ownership(location_input)
         zone = self.translate_zone(location_input)
+        if ownership is None or zone is None:
+            print("That doesn't make sense :(")
+            return
         location = f"{ownership}_{zone}"
         sent = "some card are_in " + location
         results = nltk.evaluate_sents([sent], self.grammar_file, m, g)[0][0]
@@ -373,6 +389,9 @@ class Chatbot:
         m = nltk.Model(self.valuation.domain, self.valuation)
         ownership = self.translate_ownership(location_input)
         zone = self.translate_zone(location_input)
+        if ownership is None or zone is None:
+            print("That doesn't make sense :(")
+            return
         location = f"{ownership}_{zone}"
         sent = "all card are_in " + location
         results = nltk.evaluate_sents([sent], self.grammar_file, m, g)[0][0]
@@ -386,6 +405,9 @@ class Chatbot:
         m = nltk.Model(self.valuation.domain, self.valuation)
         ownership = self.translate_ownership(location_input)
         zone = self.translate_zone(location_input)
+        if ownership is None or zone is None:
+            print("That doesn't make sense :(")
+            return
         location = f"{ownership}_{zone}"
         e = nltk.Expression.fromstring("be_in(x," + location + ")")
         sat = m.satisfiers(e, "x", g)
@@ -403,9 +425,13 @@ class Chatbot:
         m = nltk.Model(self.valuation.domain, self.valuation)
         ownership = self.translate_ownership(location_input)
         zone = self.translate_zone(location_input)
+        if ownership is None or zone is None:
+            print("That doesn't make sense :(")
+            return
         location = f"{ownership}_{zone}"
         e = nltk.Expression.fromstring("be_in(x," + location + ")")
         to_remove = m.satisfiers(e, "x", g)
+
         if len(to_remove) == 0:
             return f"No cards named {card_name}"
         else:
@@ -438,9 +464,10 @@ class Chatbot:
             if command == "quit":
                 print(parameters[0])
                 return True
-
+            # Classification
             if command == "image_classification":
                 self.print_image_model_result(parameters[0])
+            # Pattern matching
             if command == "describe":
                 self.print_description(parameters[0])
             if command == "describe_random":
@@ -461,6 +488,9 @@ class Chatbot:
                 self.show_card(parameters[0])
             if command == "show_random":
                 self.show_card_random()
+            # NLTK
+            if command == "add":
+                self.add(parameters[0], parameters[1])
             if command == "draw":
                 self.draw_card(parameters[0], parameters[1])
             if command == "cast":
@@ -482,7 +512,7 @@ class Chatbot:
 
 
 
-
+            # Similarity
             if command == "default":
                 self.similarity(parameters[0])
         else:
