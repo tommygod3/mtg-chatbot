@@ -409,6 +409,26 @@ class Chatbot:
 
         self.remove(card_name, location)
         self.add_to_zone(player, "hand", card_name)
+
+    def draw_number(self, player, number):
+        ownership = self.translate_ownership(player)
+        if ownership is None:
+            print("That doesn't make sense :(")
+            return
+        location = f"{ownership}_deck"
+
+        if not self.get_cards_in_zone_list(location):
+            print(f"Deck is empty")
+            return
+
+        try:
+            for _ in range(int(number)):
+                card_name = random.choice(self.get_cards_in_zone_list(location))
+
+                self.remove(card_name, location)
+                self.add_to_zone(player, "hand", card_name)
+        except Exception:
+            print("That doesn't make sense :(")
     
     def draw_card(self, player, card_name):
         ownership = self.translate_ownership(player)
@@ -607,6 +627,8 @@ class Chatbot:
                 self.draw_card(parameters[0], parameters[1])
             if command == "draw_random":
                 self.draw_random(parameters[0])
+            if command == "draw_number":
+                self.draw_number(parameters[0], parameters[1])
             if command == "cast":
                 self.cast_card(parameters[0], parameters[1])
             if command == "cards_in_zone":

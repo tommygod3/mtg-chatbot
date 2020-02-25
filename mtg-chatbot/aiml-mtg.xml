@@ -350,6 +350,12 @@
 <category><pattern> * DREW </pattern>
   <template>#draw_random$<star index="1"/></template></category>
 
+<category><pattern> * DRAW * CARDS </pattern>
+  <template>#draw_number$<star index="1"/>$<star index="2"/></template></category>
+
+<category><pattern> * DREW * CARDS </pattern>
+  <template>#draw_number$<star index="1"/>$<star index="2"/></template></category>
+
 <category><pattern> * DRAW * </pattern>
   <template>#draw$<star index="1"/>$<star index="2"/></template></category>
 
