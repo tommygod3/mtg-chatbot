@@ -302,11 +302,20 @@ class Chatbot:
         for term, zone in vocabulary.items():
             if term in input:
                 return zone
+
+    def translate_location(self, location_input):
+        ownership = self.translate_ownership(location_input)
+        zone = self.translate_zone(location_input)
+        if ownership is None or zone is None:
+            return None
+        return f"{ownership}_{zone}"
+            
+    def real_card_name(self, card_name):
+        return scrython.cards.Named(exact=card_name).name()
     
     def encode_card_name(self, card_name):
         self.object_counter += 1
-        card = scrython.cards.Named(exact=card_name)
-        return f"{card.name()}${str(self.object_counter)}"
+        return f"{self.real_card_name(card_name)}${str(self.object_counter)}"
 
     def decode_card_name(self, object_name):
         return object_name.split("$")[0]
@@ -358,25 +367,28 @@ class Chatbot:
         self.add_to_zone(player, "hand", card_name)
 
     def cast_card(self, player, card_name):
-        remove_from_hand_result = self.remove(card_name, f"{player} hand")
-        if remove_from_hand_result:
-            print(f"{remove_from_hand_result} in hand")
+        location = self.translate_location(f"{player} hand")
+        if location is None:
+            print("That doesn't make sense :(")
             return
+        if not self.is_card_in_zone(card_name, location):
+            print(f"{card_name} not in hand")
+            return
+
+        self.remove(card_name, location)
 
         if self.is_a_permanent(card_name):
             self.add_to_zone(player, "battlefield", card_name)
         else:
             self.add_to_zone(player, "graveyard", card_name)
     
-    def is_card_in_zone(self, location_input):
+    def is_any_card_in_zone(self, location_input):
         g = nltk.Assignment(self.valuation.domain)
         m = nltk.Model(self.valuation.domain, self.valuation)
-        ownership = self.translate_ownership(location_input)
-        zone = self.translate_zone(location_input)
-        if ownership is None or zone is None:
+        location = self.translate_location(location_input)
+        if location is None:
             print("That doesn't make sense :(")
             return
-        location = f"{ownership}_{zone}"
         sent = "some card are_in " + location
         results = nltk.evaluate_sents([sent], self.grammar_file, m, g)[0][0]
         if results[2] == True:
@@ -387,12 +399,10 @@ class Chatbot:
     def is_all_cards_in_zone(self, location_input):
         g = nltk.Assignment(self.valuation.domain)
         m = nltk.Model(self.valuation.domain, self.valuation)
-        ownership = self.translate_ownership(location_input)
-        zone = self.translate_zone(location_input)
-        if ownership is None or zone is None:
+        location = self.translate_location(location_input)
+        if location is None:
             print("That doesn't make sense :(")
             return
-        location = f"{ownership}_{zone}"
         sent = "all card are_in " + location
         results = nltk.evaluate_sents([sent], self.grammar_file, m, g)[0][0]
         if results[2] == True:
@@ -400,59 +410,96 @@ class Chatbot:
         else:
             print("No.")
 
-    def get_cards_in_zone(self, location_input):
-        g = nltk.Assignment(self.valuation.domain)
-        m = nltk.Model(self.valuation.domain, self.valuation)
-        ownership = self.translate_ownership(location_input)
-        zone = self.translate_zone(location_input)
-        if ownership is None or zone is None:
-            print("That doesn't make sense :(")
-            return
-        location = f"{ownership}_{zone}"
-        e = nltk.Expression.fromstring("be_in(x," + location + ")")
-        sat = m.satisfiers(e, "x", g)
-        if len(sat) == 0:
-            print("None.")
-        else:
-            # find satisfying objects in the valuation dictionary,
-            # and print their decoded object_id names
-            sol = self.valuation.values()
-            for so in sat:
-                print(self.decode_card_name(so))
-    
-    def remove(self, card_name, location_input):
-        g = nltk.Assignment(self.valuation.domain)
-        m = nltk.Model(self.valuation.domain, self.valuation)
-        ownership = self.translate_ownership(location_input)
-        zone = self.translate_zone(location_input)
-        if ownership is None or zone is None:
-            print("That doesn't make sense :(")
-            return
-        location = f"{ownership}_{zone}"
-        e = nltk.Expression.fromstring("be_in(x," + location + ")")
-        to_remove = m.satisfiers(e, "x", g)
+    def is_card_in_zone(self, card_name, location):
+        card = self.real_card_name(card_name)
+        for card_in_zone, number in self.get_cards_in_zone(location).items():
+            if card_in_zone == card:
+                return True
+        return False
 
-        if len(to_remove) == 0:
-            return f"No cards named {card_name}"
+    def get_cards_in_zone(self, location):
+        g = nltk.Assignment(self.valuation.domain)
+        m = nltk.Model(self.valuation.domain, self.valuation)
+        e = nltk.Expression.fromstring("be_in(x," + location + ")")
+        card_names = m.satisfiers(e, "x", g)
+        cards = {}
+        # find satisfying objects in the valuation dictionary
+        for card in card_names:
+            card_name = self.decode_card_name(card)
+            if card_name not in cards:
+                cards[card_name] = 1
+            else:
+                cards[card_name] += 1
+        return cards
+
+    def print_cards_in_zone(self, location_input):
+        location = self.translate_location(location_input)
+        if location is None:
+            print("That doesn't make sense :(")
+            return
+        cards_in_zone = self.get_cards_in_zone(location)
+        if not cards_in_zone:
+            print("None.")
+        for card, amount in cards_in_zone.items():
+            print(f"{amount} x {card}")
+    
+    def remove(self, card_name, location):
+        cards_in_zone = self.get_cards_in_zone(location)
+
+        if not cards_in_zone:
+            raise ValueError(f"No cards named {card_name} in {location}")
         else:
             for relationship in self.valuation["be_in"]:
-                if relationship[0] in to_remove:
-                    self.valuation["be_in"].remove(relationship)
-                    return False
+                relationship_card_name = self.decode_card_name(relationship[0])
+                if relationship_card_name in cards_in_zone:
+                    if self.real_card_name(card_name) == relationship_card_name:
+                        self.valuation["be_in"].remove(relationship)
+                        break
+            
+    def remove_all(self, location_input):
+        location = self.translate_location(location_input)
+        if location is None:
+            print("That doesn't make sense :(")
+            return
+       
+        to_remove = []
+        for card, amount in self.get_cards_in_zone(location).items():
+            for _ in range(amount):
+                to_remove.append(card)
+
+        for card in to_remove:
+            self.remove(card, location)
+
+    def remove_card(self, card_name, location_input):
+        location = self.translate_location(location_input)
+        if location is None:
+            print("That doesn't make sense :(")
+            return
+        if not self.is_card_in_zone(card_name, location):
+            print(f"{card_name} not in zone")
+            return
+        self.remove(card_name, location)
     
     def destroy(self, player, card_name):
-        remove_from_battlefield_result = self.remove(card_name, f"{player} battlefield")
-        if remove_from_battlefield_result:
-            print(f"{remove_from_battlefield_result} on battlefield")
+        location = self.translate_location(f"{player} battlefield")
+        if location is None:
+            print("That doesn't make sense :(")
             return
-
+        if not self.is_card_in_zone(card_name, location):
+            print(f"{card_name} not on battlefield")
+            return
+        self.remove(card_name, location)
         self.add_to_zone(player, "graveyard", card_name)
 
     def exile(self, player, card_name):
-        remove_from_battlefield_result = self.remove(card_name, f"{player} battlefield")
-        if remove_from_battlefield_result:
-            print(f"{remove_from_battlefield_result} on battlefield")
+        location = self.translate_location(f"{player} battlefield")
+        if location is None:
+            print("That doesn't make sense :(")
             return
+        if not self.is_card_in_zone(card_name, location):
+            print(f"{card_name} not on battlefield")
+            return
+        self.remove(card_name, location)
 
         self.add_to_zone(player, "exile", card_name)
 
@@ -496,13 +543,15 @@ class Chatbot:
             if command == "cast":
                 self.cast_card(parameters[0], parameters[1])
             if command == "cards_in_zone":
-                self.is_card_in_zone(parameters[0])
+                self.is_any_card_in_zone(parameters[0])
             if command == "all_cards_in":
                 self.is_all_cards_in_zone(parameters[0])
             if command == "which_cards_in":
-                self.get_cards_in_zone(parameters[0])
+                self.print_cards_in_zone(parameters[0])
+            if command == "remove_all":
+                self.remove_all(parameters[0])
             if command == "remove":
-                self.remove(parameters[0], parameters[1])
+                self.remove_card(parameters[0], parameters[1])
             if command == "destroy":
                 self.destroy(parameters[0], parameters[1])
             if command == "exile":

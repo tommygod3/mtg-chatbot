@@ -371,6 +371,9 @@
 <category><pattern> WHAT CARDS ARE ON * </pattern>
   <template>#which_cards_in$<star index="1"/></template></category>
 
+<category><pattern> REMOVE ALL CARDS FROM * </pattern>
+  <template>#remove_all$<star index="1"/></template></category>
+
 <category><pattern> REMOVE * FROM * </pattern>
   <template>#remove$<star index="1"/>$<star index="2"/></template></category>
 
