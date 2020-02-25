@@ -12,6 +12,7 @@ import numpy
 import nltk
 import pickle
 import random
+import re
 
 import scrython
 from scrython.foundation import ScryfallError
@@ -368,6 +369,31 @@ class Chatbot:
             return
         self.add_to_zone(location_input, zone, card_name)
 
+    def load_deck(self, filename):
+        path = Chatbot.get_absolute_path(filename)
+        regex = f"^(?P<amount>\d+) (?P<card>.*)$"
+        deck = {}
+        with open(path) as reader:
+            for line in reader:
+                match = re.search(regex, line)
+                if not match:
+                    break
+                deck[match.group("card")] = int(match.group("amount"))
+        return deck
+
+    def set_deck(self, player, deck_filename):
+        try:
+            deck = self.load_deck(deck_filename)
+        except Exception:
+            print("Deck {deck_filename} not valid")
+            return
+        deck_list = self.card_dict_as_list(deck)
+
+        self.remove_all(f"{player} deck")
+        
+        for card in deck_list:
+            self.add_to_zone(player, "deck", card)
+
     def draw_random(self, player):
         ownership = self.translate_ownership(player)
         if ownership is None:
@@ -487,11 +513,14 @@ class Chatbot:
                         break
     
     def get_cards_in_zone_list(self, location):
-        zone_list = []
-        for card, amount in self.get_cards_in_zone(location).items():
+        return self.card_dict_as_list(self.get_cards_in_zone(location))
+    
+    def card_dict_as_list(self, card_dict):
+        card_list = []
+        for card, amount in card_dict.items():
             for _ in range(amount):
-                zone_list.append(card)
-        return zone_list
+                card_list.append(card)
+        return card_list
             
     def remove_all(self, location_input):
         location = self.translate_location(location_input)
@@ -570,6 +599,8 @@ class Chatbot:
             if command == "show_random":
                 self.show_card_random()
             # NLTK
+            if command == "set_deck":
+                self.set_deck(parameters[0], parameters[1])
             if command == "add":
                 self.add(parameters[0], parameters[1])
             if command == "draw":
