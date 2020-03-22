@@ -13,6 +13,8 @@ import urllib.request
 import numpy
 import nltk
 
+from transformer import MtgTransformer
+
 import scrython
 from scrython.foundation import ScryfallError
 
@@ -25,6 +27,7 @@ class Chatbot:
         self.load_image_models(model)
         self.set_classnames()
         self.load_nltk(grammar_file, valuation_file)
+        self.load_transformer()
     
     def __del__(self):
         pickle.dump(self.valuation, open(self.valuation_file, "wb"))
@@ -51,6 +54,9 @@ class Chatbot:
             self.valuation = nltk.Valuation.fromstring(valuation_string)
         self.grammar_file = Chatbot.get_absolute_path(grammar_file)
         self.object_counter = 0
+
+    def load_transformer(self):
+        self.transformer = MtgTransformer()
 
     def get_absolute_path(filename):
         return f"{os.path.dirname(os.path.realpath(sys.argv[0]))}{os.path.sep}{filename}"
@@ -279,6 +285,7 @@ class Chatbot:
                 img = Image.open(BytesIO(response.content))
                 img.show()
 
+    # Superseeded by transformer
     def similarity(self, phrase):
         corpus = self.patterns[:]
         corpus.append(phrase)
@@ -290,6 +297,9 @@ class Chatbot:
         else:
             most_similar_index = similarities.index(max(similarities))
             self.handle_answer(self.kernel.respond(self.patterns[most_similar_index]))
+        
+    def transformer_predict(self, phrase):
+        print(self.transformer.predict(phrase))
 
     def translate_ownership(self, input):
         vocabulary = {
@@ -651,7 +661,7 @@ class Chatbot:
                 self.exile(parameters[0], parameters[1])
             # Similarity
             if command == "default":
-                self.similarity(parameters[0])
+                self.transformer_predict(parameters[0])
         else:
             print(answer)
 
