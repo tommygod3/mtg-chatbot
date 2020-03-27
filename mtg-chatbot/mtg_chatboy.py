@@ -47,9 +47,9 @@ class Chatbot:
         opp_deck => d2
         be_in => {}
         """
-        self.valuation_file = valuation_file
-        if os.path.isfile(valuation_file):
-            self.valuation = pickle.load(open(valuation_file, "rb"))
+        self.valuation_file = Chatbot.get_absolute_path(valuation_file)
+        if os.path.isfile(self.valuation_file):
+            self.valuation = pickle.load(open(self.valuation_file, "rb"))
         else:
             self.valuation = nltk.Valuation.fromstring(valuation_string)
         self.grammar_file = Chatbot.get_absolute_path(grammar_file)
@@ -331,7 +331,10 @@ class Chatbot:
         return f"{ownership}_{zone}"
             
     def real_card_name(self, card_name):
-        return scrython.cards.Named(exact=card_name).name()
+        try:
+            return scrython.cards.Named(exact=card_name).name()
+        except ScryfallError as e:
+            print(e)
     
     def encode_card_name(self, card_name):
         self.object_counter += 1
