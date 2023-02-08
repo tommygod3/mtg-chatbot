@@ -8,7 +8,7 @@ attrs==19.3.0
 certifi==2019.9.11
 cffi==1.13.1
 chardet==3.0.4
-cryptography==3.3.2
+cryptography==39.0.1
 idna==2.8
 isort==4.3.21
 joblib==0.13.2
